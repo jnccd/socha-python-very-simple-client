@@ -1,5 +1,17 @@
+from socha import *
 import socket
-from lxml import objectify
+from bs4 import BeautifulSoup
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 class Starter:
     def __init__(self, calculate_move, on_update) -> None:
@@ -10,13 +22,15 @@ class Starter:
         
     def do_a_barrel_roll(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(0.1)
+        sock.settimeout(1)
         sock.connect(("localhost", 13050))
         
         # Welcome
         sock.send(f"<protocol><join gameType=\"swc_2023_penguins\" />".encode())
         
         while True: # Rolls here
+            print(f'{bcolors.HEADER}---')
+            
             # Receive answer and coat it
             answer: str = self.receive(sock)
             answer = answer.removeprefix('<protocol>')
@@ -24,10 +38,20 @@ class Starter:
             if answer.__contains__('</protocol>'):
                 break
             
-            parsed_answer = objectify.fromstring(answer)
-            print(answer, parsed_answer)
+            soup = BeautifulSoup(answer, "html.parser")
+            print(f'{bcolors.OKCYAN}Got: {soup.prettify()}')
             
-            
+            if soup.joined is not None:
+                self.room_id = soup.joined.get('roomid')
+                print(f'{bcolors.WARNING}Room ID: {self.room_id}')
+            if soup.left is not None and soup.left.roomid == self.room_id:
+                break
+            for room in soup.find_all('room'):
+                if room.data.get('class') == ['moveRequest']:
+                    print(f"{bcolors.WARNING}I got a movereq D:")
+                    # TODO: Do something with it
+                if room.data.get('class') == ['memento']:
+                    
             
         s.close()
         
