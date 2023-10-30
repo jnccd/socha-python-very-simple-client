@@ -6,6 +6,8 @@ class GameState:
         self.start_team = ''
         self.current_team = ''
         
+        self.p_one_ship = None
+        self.p_two_ship = None
         self.board: dict[Field] = {}
         
         self.seg_offset_starts = [CubeCoords(-1, -2), CubeCoords(-1, -1), CubeCoords(-1, 0), CubeCoords(-2, 1), CubeCoords(-3, 2)]

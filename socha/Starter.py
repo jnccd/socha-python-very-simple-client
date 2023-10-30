@@ -1,7 +1,8 @@
 import socket
 from bs4 import BeautifulSoup
 from socha import *
-from socha.field import Field, CubeCoords, Dir
+from socha.field import Field, CubeCoords, Dir, Team
+from socha.ship import Ship
 
 class bcolors:
     HEADER = '\033[95m'
@@ -63,7 +64,7 @@ class Starter:
                     
                     # Parse segments into board dict
                     self.gameState.board = {}
-                    for seg in soup.find_all('segment'):
+                    for seg in room.find_all('segment'):
                         seg: BeautifulSoup = seg # Linting
                         dir = Dir[seg.get('direction')]
                         center: BeautifulSoup = seg.find('center')
@@ -80,6 +81,32 @@ class Starter:
                                     add(center_coords)
                                 self.gameState.board[(field_coords.q, field_coords.r)] = Field(type = field.name, coords = field_coords, is_midstream = y == 2)
                     
+                    # Parse Ships
+                    for i, ship in enumerate(room.find_all('ship')):
+                        ship: BeautifulSoup = ship # Linting
+                        position = ship.find_all('position')[0]
+                        
+                        new_ship = Ship(
+                            int(ship.get('coal')), 
+                            Dir[ship.get('direction')], 
+                            int(ship.get('freeturns')), 
+                            int(ship.get('passengers')), 
+                            int(ship.get('points')), 
+                            int(ship.get('speed')), 
+                            Team[ship.get('team')], 
+                            CubeCoords(
+                                int(position.get('q')),
+                                int(position.get('r')),
+                                int(position.get('s')),
+                        ))
+                        
+                        if i == 0:
+                            self.gameState.p_one_ship = new_ship
+                        elif i == 1:
+                            self.gameState.two_ship = new_ship
+                        else:
+                            print(f'{bcolors.FAIL}Theres too many of them, what are we going to do?')
+                            
                     print(f'{bcolors.WARNING}Got new board:')
                     self.gameState.pretty_print_board()
                     #print(f'{bcolors.WARNING}Gamestate: {self.gameState}')
