@@ -82,7 +82,7 @@ class Starter:
                                 self.gameState.board[(field_coords.q, field_coords.r)] = Field(type = field.name, coords = field_coords, is_midstream = y == 2)
                     
                     # Parse Ships
-                    for i, ship in enumerate(room.find_all('ship')):
+                    for i, ship in enumerate(in_state.find_all('ship')):
                         ship: BeautifulSoup = ship # Linting
                         position = ship.find_all('position')[0]
                         
@@ -103,7 +103,7 @@ class Starter:
                         if i == 0:
                             self.gameState.p_one_ship = new_ship
                         elif i == 1:
-                            self.gameState.two_ship = new_ship
+                            self.gameState.p_two_ship = new_ship
                         else:
                             print(f'{bcolors.FAIL}Theres too many of them, what are we going to do?')
                             
