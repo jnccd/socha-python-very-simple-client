@@ -11,7 +11,7 @@ class GameState:
         self.seg_offset_starts = [CubeCoords(-1, -2), CubeCoords(-1, -1), CubeCoords(-1, 0), CubeCoords(-2, 1), CubeCoords(-3, 2)]
         self.seg_offsets = [
             [ 
-                start.add(Dir.RIGHT.value.mult_scalar(x))
+                start.add(CubeCoords.dir_to_offset(Dir.RIGHT).mult_scalar(x))
                 for x 
                 in range(5)
             ]

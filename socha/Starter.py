@@ -1,7 +1,7 @@
 import socket
 from bs4 import BeautifulSoup
 from socha import *
-from socha.field import Dir
+from socha.field import Field, CubeCoords, Dir
 
 class bcolors:
     HEADER = '\033[95m'
@@ -70,14 +70,17 @@ class Starter:
                         center_q = int(center.get('q'))
                         center_r = int(center.get('r'))
                         center_s = int(center.get('s'))
-                        for x, field_arr in enumerate(soup.find_all('field-array')):
+                        center_coords = CubeCoords(center_q, center_r, center_s)
+                        for x, field_arr in enumerate(seg.find_all('field-array')):
                             field_arr: BeautifulSoup = field_arr # Linting
-                            print(list([c for c in field_arr.children if c.name is not None]))
-                            for y, field in enumerate(field_arr.children):
-                                #field: BeautifulSoup = field
-                                field_type = field.name
+                            for y, field in enumerate([c for c in field_arr.children if c.name is not None]):
+                                #print(x,y, len(self.gameState.seg_offsets), len(self.gameState.seg_offsets[0]))
+                                field_coords = self.gameState.seg_offsets[y][x].\
+                                    rotate_by_dir(dir).\
+                                    add(center_coords)
+                                self.gameState.board[(field_coords.q, field_coords.r)] = Field(type = field.name, coords = field_coords, is_midstream = y == 2)
                     
-                    print(f'{bcolors.WARNING}Gamestate: {self.gameState}')
+                    #print(f'{bcolors.WARNING}Gamestate: {self.gameState}')
             
         sock.close()
         
