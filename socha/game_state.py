@@ -89,7 +89,9 @@ class GameState:
                     continue
                 
                 # You're on a path in the woods, and at the end of that path is a cabin...
-                re_moves.extend([x for x in self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship) if x is not None])
+                rec_call_re = self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship)
+                if rec_call_re is not None:
+                    re_moves.extend(rec_call_re)
             # ---------------------------
         else:
             if copy_cur_ship.movement_points > 0:
@@ -109,7 +111,9 @@ class GameState:
                 copy_actions.append(Move.Advance(1))
                 
                 # You're on a path in the woods, and at the end of that path is a cabin...
-                re_moves.extend([x for x in self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship) if x is not None])
+                rec_call_re = self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship)
+                if rec_call_re is not None:
+                    re_moves.extend(rec_call_re)
                 # ---------------------------
             if copy_cur_ship.free_turns > 0 or copy_cur_ship.coal > 0:
                 # --------- Turn Action
@@ -120,14 +124,19 @@ class GameState:
                     copy_other_ship: Ship = copy.deepcopy(other_ship)
                     
                     # Update vars
-                    copy_cur_ship.movement_points -= 1
-                    copy_cur_ship.pos = copy_cur_ship.pos.add(CubeCoords.dir_to_offset(copy_cur_ship.dir))
+                    if copy_cur_ship.free_turns > 0:
+                        copy_cur_ship.free_turns -= 1
+                    else:
+                        copy_cur_ship.coal -= 1
+                    copy_cur_ship.dir = dir
                     
                     # Create Action obj
                     copy_actions.append(Move.Advance(1))
                     
                     # You're on a path in the woods, and at the end of that path is a cabin...
-                    re_moves.extend([x for x in self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship) if x is not None])
+                    rec_call_re = self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship)
+                    if rec_call_re is not None:
+                        re_moves.extend(rec_call_re)
                 # ---------------------------
     
     def pretty_print_board(self):
