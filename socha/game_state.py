@@ -1,5 +1,3 @@
-
-
 class GameState:
     def __init__(self) -> None:
         self.turn = 0
