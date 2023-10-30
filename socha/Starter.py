@@ -27,7 +27,7 @@ class Starter:
         sock.connect(("localhost", 13050))
         
         # Welcome
-        sock.send(f"<protocol><join gameType=\"swc_2023_penguins\" />".encode())
+        self.send(sock, payload=f"<protocol><join gameType=\"swc_2023_penguins\" />")
         
         # Init data
         self.game_state = GameState()
@@ -44,7 +44,7 @@ class Starter:
             
             # Yummy
             soup = BeautifulSoup(answer, "html.parser")
-            print(f'{bcolors.OKCYAN}Got: {soup.prettify()}')
+            #rint(f'{bcolors.OKCYAN}Got:\n{soup.prettify()}')
             
             if soup.joined is not None:
                 self.room_id = soup.joined.get('roomid')
@@ -54,9 +54,10 @@ class Starter:
             for room in soup.find_all('room'):
                 room: BeautifulSoup = room # Linting
                 if room.data.get('class') == ['moveRequest']:
-                    print(f"{bcolors.WARNING}I got a movereq D:")
+                    print(f"{bcolors.WARNING}I got a movereq")
                     move_answer: Move = self.calculate_move(self.game_state)
-                    sock.send(f'<room roomId="{self.room_id}">{move_answer.to_xml()}</room>'.encode())
+                    xml_send_payload = f'<room roomId="{self.room_id}">\n{move_answer.to_xml()}</room>'
+                    self.send(sock, xml_send_payload)
                 if room.data.get('class') == ['memento']:
                     in_state = room.data.state
                     
@@ -119,5 +120,9 @@ class Starter:
         received: str = ''
         while not received.__contains__('</room>') and not received.__contains__('</protocol>'):
             received += sock.recv(256).decode()
-        #print(received)
+        print(f'{bcolors.OKCYAN}Received:\n{received}')
         return received
+    
+    def send(self, sock, payload: str):
+        sock.send(payload.encode())
+        print(f'{bcolors.OKGREEN}Sent:\n{payload}')
