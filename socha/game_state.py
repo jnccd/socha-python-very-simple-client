@@ -121,7 +121,9 @@ class GameState:
                 if rec_call_re is not None:
                     re_moves.extend(rec_call_re)
                 # ---------------------------
-            if (cur_ship.free_turns > 0 or cur_ship.coal > 0) and (not fast or (fast and len([x for x in actions if type(x) is Move.Turn]) < 1)):
+            if (cur_ship.free_turns > 0 or cur_ship.coal > 0) and \
+                ((type(actions[-1]) is not Move.Turn) if len(actions) > 0 else True) and \
+                (not fast or (fast and len([x for x in actions if type(x) is Move.Turn]) < 1)):
                 # --------- Turn Action
                 for dir in [x for x in Dir if x != cur_ship.dir]:
                     # Copy everything
