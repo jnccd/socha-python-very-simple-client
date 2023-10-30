@@ -21,7 +21,10 @@ class GameState:
             for start 
             in self.seg_offset_starts
         ]
-        
+          
+    def get_possible_moves():
+        pass
+         
     def pretty_print_board(self):
         qs = [q for q,r in self.board.keys()]
         rs = [r for q,r in self.board.keys()]
@@ -44,6 +47,6 @@ class GameState:
                 else:
                     print('  ', end='')
             print()
-                
+           
     def __str__(self) -> str:
         return str(vars(self))
