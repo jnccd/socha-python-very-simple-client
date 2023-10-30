@@ -73,13 +73,13 @@ class Field:
     def chr(self):
         if self.type == 'water':
             if self.is_midstream:
-                return 'M'
+                return 'm'
             else:
-                return 'W'
+                return 'w'
         elif self.type == 'island':
             return 'O'
         elif self.type == 'passenger':
-            return '1'
+            return 'P'
         else:
             return '?'
         
