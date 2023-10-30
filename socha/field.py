@@ -61,6 +61,9 @@ class CubeCoords:
         elif dir is Dir.UP_RIGHT:
             return CubeCoords(1, -1, 0)
         
+    def qr_tuple(self):
+        return (self.q, self.r)
+        
     def __str__(self) -> str:
         return str(vars(self))
     
