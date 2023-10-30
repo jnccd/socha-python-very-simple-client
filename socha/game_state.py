@@ -22,7 +22,10 @@ class GameState:
             in self.seg_offset_starts
         ]
           
-    def get_possible_moves():
+    def get_possible_moves(self):
+        pass
+    
+    def _recursive_cursed_function(self):
         pass
          
     def pretty_print_board(self):
