@@ -1,4 +1,5 @@
 from socha import *
+from socha.game_state import GameState 
 import socket
 from bs4 import BeautifulSoup
 
@@ -14,9 +15,8 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 class Starter:
-    def __init__(self, calculate_move, on_update) -> None:
+    def __init__(self, calculate_move) -> None:
         self.calculate_move = calculate_move
-        self.on_update = on_update
         
         self.do_a_barrel_roll()
         
@@ -27,6 +27,9 @@ class Starter:
         
         # Welcome
         sock.send(f"<protocol><join gameType=\"swc_2023_penguins\" />".encode())
+        
+        # Init data
+        self.gameState = GameState()
         
         while True: # Rolls here
             print(f'{bcolors.HEADER}---')
@@ -51,7 +54,15 @@ class Starter:
                     print(f"{bcolors.WARNING}I got a movereq D:")
                     # TODO: Do something with it
                 if room.data.get('class') == ['memento']:
+                    in_state = room.data.state
                     
+                    self.gameState.turn = int(in_state.get('turn')[0])
+                    self.gameState.start_team = in_state.get('startteam')
+                    self.gameState.current_team = in_state.get('currentteam')
+                    
+                    
+                    
+                    print(f'{bcolors.WARNING} {self.gameState}')
             
         s.close()
         

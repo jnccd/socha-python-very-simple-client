@@ -1,9 +1,8 @@
 from socha import *
 
 def calculate_move(state: GameState) -> Move:
-    global gameState
     
-    possibleMoves = gameState.possible_moves
+    possibleMoves = state.possible_moves
     return possibleMoves[0]
         
 if __name__ == "__main__":
