@@ -4,7 +4,7 @@ def calculate_move(state: GameState) -> Move:
     
     # TODO: Add logic here
     
-    return state.possible_moves[0]
+    return state.get_possible_moves()[0]
         
 if __name__ == "__main__":
     Starter(calculate_move)
