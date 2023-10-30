@@ -1,4 +1,5 @@
 from socha.field import CubeCoords, Dir, Field
+from socha.ship import Ship
 
 class GameState:
     def __init__(self) -> None:
@@ -6,8 +7,8 @@ class GameState:
         self.start_team = ''
         self.current_team = ''
         
-        self.p_one_ship = None
-        self.p_two_ship = None
+        self.p_one_ship: Ship = None
+        self.p_two_ship: Ship = None
         self.board: dict[Field] = {}
         
         self.seg_offset_starts = [CubeCoords(-1, -2), CubeCoords(-1, -1), CubeCoords(-1, 0), CubeCoords(-2, 1), CubeCoords(-3, 2)]
@@ -34,8 +35,11 @@ class GameState:
             norm_r = r - min_r
             print(''.join([' ' for x in range(norm_r)]), end='')
             for q in range(min_q, max_q+1):
-                norm_q = q - min_q
-                if (q,r) in self.board:
+                if self.p_one_ship.pos.q == q and self.p_one_ship.pos.r == r:
+                    print('1|', end='')
+                elif self.p_two_ship.pos.q == q and self.p_two_ship.pos.r == r:
+                    print('2|', end='')
+                elif (q,r) in self.board:
                     print(self.board[(q,r)].chr()+'|', end='')
                 else:
                     print('  ', end='')
