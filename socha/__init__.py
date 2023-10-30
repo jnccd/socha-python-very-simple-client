@@ -1,11 +1,17 @@
-from socha.game_state import GameState 
-from socha.move import Move 
-from socha.starter import Starter 
-from socha.field import Dir
+from socha.field import Field, CubeCoords, Dir, Team, Enum 
+from socha.game_state import GameState
+from socha.move import Move
+from socha.ship import Ship
+from socha.starter import Starter
 
 __all__ = [
+    'Field',
+    'CubeCoords',
+    'Dir',
+    'Team',
+    'Enum',
     'GameState',
     'Move',
+    'Ship',
     'Starter',
-    'Dir',
 ]
