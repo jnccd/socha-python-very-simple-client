@@ -30,7 +30,7 @@ class GameState:
         else:
             return self.board[coords.qr_tuple()]
             
-    def get_possible_moves(self):
+    def get_possible_moves(self, fast = True):
         if self.current_team == 'ONE':
             cur_ship = copy.deepcopy(self.p_one_ship)
             other_ship = copy.deepcopy(self.p_two_ship)
@@ -40,28 +40,12 @@ class GameState:
         else:
             print('huh?')
             
-        moves = self._recursed_movement(actions = [], cur_ship = cur_ship, other_ship = other_ship)
+        moves = self._recursed_movement(actions = [], cur_ship = cur_ship, other_ship = other_ship, fast = fast)
         
         return moves
         
-    def _recursed_movement(self, actions: list[Move.Action], cur_ship: Ship, other_ship: Ship) -> list[Move]:
-        # --- Check for illegal state
-        # Coal
-        if cur_ship.coal < 0:
-            return None
-        # Movement Points
-        if cur_ship.movement_points < 0:
-            return None
-        # Ship position on board
-        if cur_ship.pos.qr_tuple() not in self.board or \
-            self.board[cur_ship.pos.qr_tuple()].type != 'water':
-            return None
-        
-        # --- Wrap finished actions in move obj
-        if cur_ship.movement_points == 0:
-            new_move = Move(actions)
-            re_moves.append(new_move)
-            return re_moves
+    def _recursed_movement(self, actions: list[Move.IAction], cur_ship: Ship, other_ship: Ship, fast: bool) -> list[Move]:
+        #print('len(actions)', len(actions), len([x for x in actions if type(x) is Move.Turn]))
         
         re_moves = []
         if cur_ship.movement_points == None:
@@ -82,19 +66,41 @@ class GameState:
                     copy_cur_ship.free_turns = 1
                 
                 # Create Action obj
-                copy_actions.append(Move.Acceleration(speed_diff))
+                if speed_diff > 0:
+                    copy_actions.append(Move.Acceleration(speed_diff))
                 
                 # Check for illegal state
                 if copy_cur_ship.coal < 0:
                     continue
                 
                 # You're on a path in the woods, and at the end of that path is a cabin...
-                rec_call_re = self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship)
+                rec_call_re = self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship, fast)
                 if rec_call_re is not None:
                     re_moves.extend(rec_call_re)
             # ---------------------------
+            
+            # --- Return move objs
+            return re_moves
         else:
-            if copy_cur_ship.movement_points > 0:
+            # --- Check for illegal state
+            # Coal
+            if cur_ship.coal < 0:
+                return None
+            # Movement Points
+            if cur_ship.movement_points < 0:
+                return None
+            # Ship position on board
+            if cur_ship.pos.qr_tuple() not in self.board or \
+                self.board[cur_ship.pos.qr_tuple()].type != 'water':
+                return None
+            
+            # --- Wrap finished actions in move obj
+            if cur_ship.movement_points == 0:
+                new_move = Move(actions)
+                re_moves.append(new_move)
+                return re_moves
+            
+            if cur_ship.movement_points > 0:
                 # --------- Advance Action
                 # Copy everything
                 copy_actions: list[Move.Action] = copy.deepcopy(actions)
@@ -111,33 +117,40 @@ class GameState:
                 copy_actions.append(Move.Advance(1))
                 
                 # You're on a path in the woods, and at the end of that path is a cabin...
-                rec_call_re = self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship)
+                rec_call_re = self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship, fast)
                 if rec_call_re is not None:
                     re_moves.extend(rec_call_re)
                 # ---------------------------
-            if copy_cur_ship.free_turns > 0 or copy_cur_ship.coal > 0:
+            if (cur_ship.free_turns > 0 or cur_ship.coal > 0) and (not fast or (fast and len([x for x in actions if type(x) is Move.Turn]) < 1)):
                 # --------- Turn Action
-                for dir in Dir:
+                for dir in [x for x in Dir if x != cur_ship.dir]:
                     # Copy everything
                     copy_actions: list[Move.Action] = copy.deepcopy(actions)
                     copy_cur_ship: Ship = copy.deepcopy(cur_ship)
                     copy_other_ship: Ship = copy.deepcopy(other_ship)
                     
                     # Update vars
-                    if copy_cur_ship.free_turns > 0:
-                        copy_cur_ship.free_turns -= 1
-                    else:
-                        copy_cur_ship.coal -= 1
+                    for x in range(copy_cur_ship.dir.diff(dir)):
+                        if copy_cur_ship.free_turns > 0:
+                            copy_cur_ship.free_turns -= 1
+                        else:
+                            copy_cur_ship.coal -= 1
                     copy_cur_ship.dir = dir
                     
+                    # Check for illegal state
+                    if copy_cur_ship.coal < 0:
+                        continue
+                    
                     # Create Action obj
-                    copy_actions.append(Move.Advance(1))
+                    copy_actions.append(Move.Turn(dir))
                     
                     # You're on a path in the woods, and at the end of that path is a cabin...
-                    rec_call_re = self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship)
+                    rec_call_re = self._recursed_movement(copy_actions, copy_cur_ship, copy_other_ship, fast)
                     if rec_call_re is not None:
                         re_moves.extend(rec_call_re)
                 # ---------------------------
+            # --- Return move objs
+            return re_moves
     
     def pretty_print_board(self):
         qs = [q for q,r in self.board.keys()]
