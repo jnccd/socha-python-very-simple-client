@@ -6,5 +6,11 @@ class GameState:
         self.start_team = ''
         self.current_team = ''
         
+        self.seg_offsets = [
+            []
+        ]
+        
+        board = {}
+        
     def __str__(self) -> str:
-        return vars(self)
+        return str(vars(self))

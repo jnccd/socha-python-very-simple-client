@@ -22,7 +22,7 @@ class Starter:
         
     def do_a_barrel_roll(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.settimeout(1)
+        sock.settimeout(2)
         sock.connect(("localhost", 13050))
         
         # Welcome
@@ -60,11 +60,12 @@ class Starter:
                     self.gameState.start_team = in_state.get('startteam')
                     self.gameState.current_team = in_state.get('currentteam')
                     
+                    self.gameState.board = {}
                     
                     
                     print(f'{bcolors.WARNING} {self.gameState}')
             
-        s.close()
+        sock.close()
         
     def receive(self, sock) -> str:
         received: str = ''
