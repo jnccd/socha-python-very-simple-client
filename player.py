@@ -1,6 +1,6 @@
 from socha import *
 
-gameState: GameState
+gameState: GameState = None
 
 def calculate_move() -> Move:
     global gameState
@@ -8,7 +8,7 @@ def calculate_move() -> Move:
     possibleMoves = gameState.possible_moves
     return possibleMoves[0]
 
-def on_update( state: GameState):
+def on_update(state: game_state):
     global gameState
     
     gameState = state
@@ -16,3 +16,4 @@ def on_update( state: GameState):
 if __name__ == "__main__":
     Starter(calculate_move = calculate_move, 
             on_update = on_update)
+    
