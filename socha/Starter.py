@@ -30,7 +30,7 @@ class Starter:
         sock.send(f"<protocol><join gameType=\"swc_2023_penguins\" />".encode())
         
         # Init data
-        self.gameState = GameState()
+        self.game_state = GameState()
         
         while True: # Rolls here
             print(f'{bcolors.HEADER}---')
@@ -55,16 +55,17 @@ class Starter:
                 room: BeautifulSoup = room # Linting
                 if room.data.get('class') == ['moveRequest']:
                     print(f"{bcolors.WARNING}I got a movereq D:")
-                    # TODO: Do something with it
+                    move_answer: Move = self.calculate_move(self.game_state)
+                    sock.send(f'<room roomId="{self.room_id}">{move_answer.to_xml()}</room>'.encode())
                 if room.data.get('class') == ['memento']:
                     in_state = room.data.state
                     
-                    self.gameState.turn = int(in_state.get('turn'))
-                    self.gameState.start_team = in_state.get('startteam')
-                    self.gameState.current_team = in_state.get('currentteam')
+                    self.game_state.turn = int(in_state.get('turn'))
+                    self.game_state.start_team = in_state.get('startteam')
+                    self.game_state.current_team = in_state.get('currentteam')
                     
                     # Parse segments into board dict
-                    self.gameState.board = {}
+                    self.game_state.board = {}
                     for seg in room.find_all('segment'):
                         seg: BeautifulSoup = seg # Linting
                         dir = Dir[seg.get('direction')]
@@ -76,11 +77,11 @@ class Starter:
                         for x, field_arr in enumerate(seg.find_all('field-array')):
                             field_arr: BeautifulSoup = field_arr # Linting
                             for y, field in enumerate([c for c in field_arr.children if c.name is not None]):
-                                #print(x,y, len(self.gameState.seg_offsets), len(self.gameState.seg_offsets[0]))
-                                field_coords = self.gameState.seg_offsets[y][x].\
+                                #print(x,y, len(self.game_state.seg_offsets), len(self.game_state.seg_offsets[0]))
+                                field_coords = self.game_state.seg_offsets[y][x].\
                                     rotate_by_dir(dir).\
                                     add(center_coords)
-                                self.gameState.board[(field_coords.q, field_coords.r)] = Field(type = field.name, coords = field_coords, is_midstream = y == 2)
+                                self.game_state.board[(field_coords.q, field_coords.r)] = Field(type = field.name, coords = field_coords, is_midstream = y == 2)
                     
                     # Parse Ships
                     for i, ship in enumerate(in_state.find_all('ship')):
@@ -102,15 +103,15 @@ class Starter:
                         ))
                         
                         if i == 0:
-                            self.gameState.p_one_ship = new_ship
+                            self.game_state.p_one_ship = new_ship
                         elif i == 1:
-                            self.gameState.p_two_ship = new_ship
+                            self.game_state.p_two_ship = new_ship
                         else:
                             print(f'{bcolors.FAIL}Theres too many of them, what are we going to do?')
                             
                     print(f'{bcolors.WARNING}Got new board:')
-                    self.gameState.pretty_print_board()
-                    #print(f'{bcolors.WARNING}Gamestate: {self.gameState}')
+                    self.game_state.pretty_print_board()
+                    #print(f'{bcolors.WARNING}Gamestate: {self.game_state}')
             
         sock.close()
         
