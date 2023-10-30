@@ -16,6 +16,11 @@ class Dir(Enum):
         val = (self.value + step_width) % len(Dir)
         return Dir(val)
     
+    def diff(self, dir):
+        return min(abs((self.value - 5) - dir.value),
+                   abs((self.value    ) - dir.value),
+                   abs((self.value + 5) - dir.value),)
+    
 class CubeCoords:
     def __init__(self, q, r, s = None):
         if s is None:
