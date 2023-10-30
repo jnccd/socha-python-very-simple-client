@@ -12,6 +12,10 @@ class Dir(Enum):
     UP_LEFT=4
     UP_RIGHT=5
     
+    def step(self, step_width):
+        val = (self.value + step_width) % len(Dir)
+        return Dir(val)
+    
 class CubeCoords:
     def __init__(self, q, r, s = None):
         if s is None:
