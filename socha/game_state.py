@@ -1,4 +1,4 @@
-from socha.field import CubeCoords, Dir
+from socha.field import CubeCoords, Dir, Field
 
 class GameState:
     def __init__(self) -> None:
@@ -6,7 +6,7 @@ class GameState:
         self.start_team = ''
         self.current_team = ''
         
-        board = {}
+        self.board: dict[Field] = {}
         
         self.seg_offset_starts = [CubeCoords(-1, -2), CubeCoords(-1, -1), CubeCoords(-1, 0), CubeCoords(-2, 1), CubeCoords(-3, 2)]
         self.seg_offsets = [
@@ -19,5 +19,25 @@ class GameState:
             in self.seg_offset_starts
         ]
         
+    def pretty_print_board(self):
+        qs = [q for q,r in self.board.keys()]
+        rs = [r for q,r in self.board.keys()]
+        
+        min_q = min(qs)
+        max_q = max(qs)
+        min_r = min(rs)
+        max_r = max(rs)
+        
+        for r in range(min_r, max_r+1):
+            norm_r = r - min_r
+            print(''.join([' ' for x in range(norm_r)]), end='')
+            for q in range(min_q, max_q+1):
+                norm_q = q - min_q
+                if (q,r) in self.board:
+                    print(self.board[(q,r)].chr()+'|', end='')
+                else:
+                    print('  ', end='')
+            print()
+                
     def __str__(self) -> str:
         return str(vars(self))

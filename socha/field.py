@@ -70,5 +70,18 @@ class Field:
         self.coords = coords
         self.is_midstream = is_midstream
         
+    def chr(self):
+        if self.type == 'water':
+            if self.is_midstream:
+                return 'M'
+            else:
+                return 'W'
+        elif self.type == 'island':
+            return 'O'
+        elif self.type == 'passenger':
+            return '1'
+        else:
+            return '?'
+        
     def __str__(self) -> str:
         return str(vars(self))

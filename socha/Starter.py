@@ -80,6 +80,8 @@ class Starter:
                                     add(center_coords)
                                 self.gameState.board[(field_coords.q, field_coords.r)] = Field(type = field.name, coords = field_coords, is_midstream = y == 2)
                     
+                    print(f'{bcolors.WARNING}Got new board:')
+                    self.gameState.pretty_print_board()
                     #print(f'{bcolors.WARNING}Gamestate: {self.gameState}')
             
         sock.close()
