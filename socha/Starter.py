@@ -1,7 +1,7 @@
-from socha import *
-from socha.game_state import GameState 
 import socket
 from bs4 import BeautifulSoup
+from socha import *
+from socha.field import Dir
 
 class bcolors:
     HEADER = '\033[95m'
@@ -50,20 +50,34 @@ class Starter:
             if soup.left is not None and soup.left.roomid == self.room_id:
                 break
             for room in soup.find_all('room'):
+                room: BeautifulSoup = room # Linting
                 if room.data.get('class') == ['moveRequest']:
                     print(f"{bcolors.WARNING}I got a movereq D:")
                     # TODO: Do something with it
                 if room.data.get('class') == ['memento']:
                     in_state = room.data.state
                     
-                    self.gameState.turn = int(in_state.get('turn')[0])
+                    self.gameState.turn = int(in_state.get('turn'))
                     self.gameState.start_team = in_state.get('startteam')
                     self.gameState.current_team = in_state.get('currentteam')
                     
+                    # Parse segments into board dict
                     self.gameState.board = {}
+                    for seg in soup.find_all('segment'):
+                        seg: BeautifulSoup = seg # Linting
+                        dir = Dir[seg.get('direction')]
+                        center: BeautifulSoup = seg.find('center')
+                        center_q = int(center.get('q'))
+                        center_r = int(center.get('r'))
+                        center_s = int(center.get('s'))
+                        for x, field_arr in enumerate(soup.find_all('field-array')):
+                            field_arr: BeautifulSoup = field_arr # Linting
+                            print(list([c for c in field_arr.children if c.name is not None]))
+                            for y, field in enumerate(field_arr.children):
+                                #field: BeautifulSoup = field
+                                field_type = field.name
                     
-                    
-                    print(f'{bcolors.WARNING} {self.gameState}')
+                    print(f'{bcolors.WARNING}Gamestate: {self.gameState}')
             
         sock.close()
         
