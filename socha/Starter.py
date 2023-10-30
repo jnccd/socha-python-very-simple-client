@@ -42,6 +42,7 @@ class Starter:
             if answer.__contains__('</protocol>'):
                 break
             
+            # Yummy
             soup = BeautifulSoup(answer, "html.parser")
             print(f'{bcolors.OKCYAN}Got: {soup.prettify()}')
             
