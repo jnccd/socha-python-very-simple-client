@@ -39,8 +39,8 @@ class Move:
         self.actions = actions
         
     def to_xml(self):
-        re = '<move>\n'
+        re = '<move>\n<actions>\n'
         for action in self.actions:
             re += f'{action.to_xml()}\n'
-        re += '</move>\n'
+        re += '</actions>\n</move>\n'
         return re
