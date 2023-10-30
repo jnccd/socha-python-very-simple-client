@@ -10,3 +10,6 @@ class Ship:
         self.speed = speed
         self.team = team
         self.pos = pos
+        
+        self.movement_points: int = None
+        self.free_turns: int = None
