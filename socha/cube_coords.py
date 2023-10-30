@@ -1,5 +1,8 @@
 class CubeCoord:
-    def __init__(self, q, r, s):
+    def __init__(self, q, r, s = None):
+        if s is None:
+            s = -(q+r)
+        
         self.q = q
         self.r = r
         self.s = s
