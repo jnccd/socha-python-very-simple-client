@@ -43,4 +43,4 @@ class Move:
         for action in self.actions:
             re += f'{action.to_xml()}\n'
         re += '</move>\n'
-        return f'<turn direction="{self.direction}" />'
+        return re
