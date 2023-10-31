@@ -27,7 +27,7 @@ class Starter:
         sock.connect(("localhost", 13050))
         
         # Welcome
-        self.send(sock, payload=f"<protocol><join gameType=\"swc_2023_penguins\" />")
+        self.send(sock, payload=f"<protocol><join gameType=\"swc_2024_mississippi_queen\" />")
         
         # Init data
         self.game_state = GameState()
