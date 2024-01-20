@@ -17,9 +17,9 @@ class Dir(Enum):
         return Dir(val)
     
     def diff(self, dir):
-        return min(abs((self.value - 5) - dir.value),
+        return min(abs((self.value - 6) - dir.value),
                    abs((self.value    ) - dir.value),
-                   abs((self.value + 5) - dir.value),)
+                   abs((self.value + 6) - dir.value),)
     
 class CubeCoords:
     def __init__(self, q, r, s = None):
